@@ -1,0 +1,84 @@
+<script language="JavaScript">
+function checkAll() {
+    allChecked = document.getElementById("scans").checked;
+    for(i=0; i<document.getElementById("scan_rowcount").value; i++) {
+        document.getElementById("scan_"+i).checked = allChecked;
+    }
+}
+</script>
+
+##Copyright 2005 Harvard University / Howard Hughes Medical Institute (HHMI) All Rights Reserved
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+
+#set ($template = $data.getTemplateInfo())
+$!template.setLayoutTemplate("/Popup.vm")
+$page.setTitle("CNDA -- Central Neuroimaging Data Archive")
+$page.setLinkColor($ui.alink)
+$page.setVlinkColor($ui.vlink)
+#if ($data.message)
+    <DIV class="error">$data.message</DIV><br>
+#end
+<font face="$ui.sansSerifFonts">
+
+<form name="DicomToNifti" method="post" action="$link.setAction("BuildAction")" >
+    <br/> <br/>
+    <table>
+        <tr>
+            <td>
+                <b>
+                    <font face="$ui.sansSerifFonts">
+                        Project: $om.getProject()
+                    </font>
+                </b>
+            </td>
+            <td>
+                <b>
+                    <font face="$ui.sansSerifFonts">
+                        Session: $om.getLabel()
+                    </font>
+                </b>
+            </td>
+        </tr>
+    </table>
+    <br/>
+
+    <table>
+        <tr>
+            <td>&nbsp;</td>
+            <td colspan="2">&nbsp;<b>Input parameters</b></td>
+        </tr>
+
+        #set ($ovr="overwrite")
+        #set ($param=$projectSettings.get($ovr))
+        #set($hasAnyNIFTI=false)
+        #foreach ($scan in $om.getScans_scan())
+            #foreach($entry in $scan.getReadableFileStats())
+                #if(!$hasAnyNIFTI && $entry.contains("NIFTI"))
+                    #set($hasAnyNIFTI=true)
+                #end
+            #end
+        #end
+        #if($hasAnyNIFTI)
+        <tr>
+            <td>&nbsp;</td>
+            <td>Should existing NIFTI files be overwritten?</td>
+            <td>
+                <input type="radio" name="$ovr" id="$ovr" value="Y" #if ($param.csvvalues=="Y") checked #end />Overwrite &nbsp;
+                <input type="radio" name="$ovr" id="$ovr" value="N" #if ($param.csvvalues=="N") checked #end />Leave alone
+            </td>
+        </tr>
+        #else
+        <input type="hidden" name="$ovr" id="$ovr" value="$param.csvvalues"  />
+        #end
+    </table>
+
+    #xdatPassItemFormFields($search_element $search_field $search_value $project)
+
+
+    <input type="hidden" name="pipeline_location" value="$pipelinePath"/>
+    <input type="submit" name="eventSubmit_doDicomtonifti" value="Queue Job" />
+    &nbsp;&nbsp;
+    <input type="button" ONCLICK="javascript:self.close()" value="Close"/>
+    <p>&nbsp;</p>
+</form>
+

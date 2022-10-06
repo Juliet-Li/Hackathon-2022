@@ -1,0 +1,76 @@
+##Copyright 2009 Washington University in St. Louis All Rights Reserved
+
+##<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+
+#set ($template = $data.getTemplateInfo())
+$!template.setLayoutTemplate("/Popup.vm")
+$page.setTitle("Protocol Check Setup")
+$page.setLinkColor($ui.alink)
+$page.setVlinkColor($ui.vlink)
+#if ($data.message)
+<DIV class="error">$data.message</DIV><br>
+#end
+<font face="$ui.sansSerifFonts">
+
+<form ID="dicomtonifti" name="dicomtonifti" method="post" action="$link.setAction("ManagePipeline")">
+
+<b>DICOM to NIFTI setup for $project </b>
+
+<br/>
+
+<p>
+$newpipeline.getDescription()
+</p>
+
+#set ($schemaType = $newpipeline.getSchemaElementName())
+#set ($parameters =$newpipeline.getParameters_parameter())
+<br/>
+<br/>
+
+<p>
+<b> Please define the following default parameters for your project. </b>
+<br/>Each parameter can be changed at run-time if the pipeline is launched manually, but if the pipeline is auto-run these defaults will always be used.
+
+</p>
+<table>
+    <tr>
+        <td>Launch pipeline automatically when session is archived.</td>
+        <td> <input type="checkbox" name="auto_archive" checked/> </td>
+    </tr>
+    <tr>#set ($i=0)
+        <input type="hidden" id="${schemaType}.parameters.parameter[$i].name" name="${schemaType}.parameters.parameter[$i].name" value="$parameters.get($i).name"/>
+        <input type="hidden" id="${schemaType}.parameters.parameter[$i].description" name="${schemaType}.parameters.parameter[$i].description" value="$parameters.get($i).description"/>
+        <td>Should preexisting NIFTI files be overwritten or ignored?</td>
+        <td>
+            <input type="radio" id="${schemaType}.parameters.parameter[$i].csvValues" name="${schemaType}.parameters.parameter[$i].csvValues" value="Y" checked="checked" /> Overwrite &nbsp;
+            <input type="radio" id="${schemaType}.parameters.parameter[$i].csvValues" name="${schemaType}.parameters.parameter[$i].csvValues" value="N" /> Ignore
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2" align="center"><input type="button" ONCLICK="javascript:window.close();" value="Close"/>&nbsp;&nbsp;&nbsp;<input type="submit"  name="eventSubmit_doAddprojectpipeline" value="Submit"/></td>
+    </tr>
+
+</table>
+
+
+<input type="hidden" id="${schemaType}.stepId" name="${schemaType}.stepId" value="AUTO_ARCHIVE_DicomToNifti"/>
+<input type="hidden" id="${schemaType}.displayText" name="${schemaType}.displayText" value="DicomToNifti"/>
+<input type="hidden" id="${schemaType}.name" name="${schemaType}.name" value="DicomToNifti"/>
+<input type="hidden" id="${schemaType}.location" name="${schemaType}.location" value="$newpipeline.getLocation()"/>
+<input type="hidden" id="${schemaType}.customwebpage" name="${schemaType}.customwebpage" value="$newpipeline.getCustomwebpage()"/>
+<input type="hidden" id="${schemaType}.description" name="${schemaType}.description" value='$newpipeline.getDescription()'/>
+
+
+
+<input type="hidden" name="search_element" value="xnat:projectData"/>
+<input type="hidden" name="search_field" value="xnat:projectData.ID"/>
+<input type="hidden" name="search_value" value="$project"/>
+<input type="hidden" name="project" value="$project"/>
+<input type="hidden" name="pipeline_path" value="$pipeline_path"/>
+<input type="hidden" name="dataType" value="$dataType"/>
+<input type="hidden" name="schemaType" value="$schemaType"/>
+<input type="hidden" name="edit" value="$edit"/>
+<input type="hidden" name="destination" value="JS_Parent_Return.vm"/>
+
+
+</form>
